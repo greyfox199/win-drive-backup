@@ -144,9 +144,9 @@ try {
         Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Successfully validated disk drive letters and IDs of source and destination disks, proceeding to attempt robocopy" -LogType "Info"
 		try {
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Backing up via robocopy via the following command..." -LogType "Info"
-            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD ""$RECYCLE.BIN"" ""System Volume Information"" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np" -LogType "Info"
+            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD ""`$RECYCLE.BIN"" ""System Volume Information"" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np" -LogType "Info"
 			#$result = robocopy G:\ T:\ /MIR /XD "$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
-			#$result = robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD "$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
+			#$result = robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD "`$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Successfully backed up data via robocopy with result $($result)" -LogType "Info"
 		} catch {
 			$ErrorMessage = $_.Exception.Message
