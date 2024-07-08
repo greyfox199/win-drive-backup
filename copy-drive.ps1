@@ -151,17 +151,17 @@ try {
 		} catch {
 			$ErrorMessage = $_.Exception.Message
 			$line = $_.InvocationInfo.ScriptLineNumber
-			$global:arrStrErrors += "Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result) at $($line) with the following error: $ErrorMessage"
+			$arrStrErrors += "Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result) at $($line) with the following error: $ErrorMessage"
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result) at $($line) with the following error: $ErrorMessage" -LogType "Error"
 		}
 	} else {
-		$global:arrStrErrors += "Error: There were no matches for source disk of $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) and destination disk of $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID), so not proceeding.  Please verify the output of get-volume and update the drive letters/IDs if necessary"
+		$arrStrErrors += "Error: There were no matches for source disk of $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) and destination disk of $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID), so not proceeding.  Please verify the output of get-volume and update the drive letters/IDs if necessary"
 		Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: There were no matches for source disk of $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) and destination disk of $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID), so not proceeding.  Please verify the output of get-volume and update the drive letters/IDs if necessary" -LogType "Error"
 	}
 } catch {
 	$ErrorMessage = $_.Exception.Message
 	$line = $_.InvocationInfo.ScriptLineNumber
-	$global:arrStrErrors += "Failed to get all disks for comparision at $($line) with the following error: $ErrorMessage"
+	$arrStrErrors += "Failed to get all disks for comparision at $($line) with the following error: $ErrorMessage"
     Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Failed to get all disks for comparision at $($line) with the following error: $ErrorMessage" -LogType "Error"
 }
 
