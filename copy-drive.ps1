@@ -3,7 +3,6 @@ param (
     [Parameter (Mandatory = $true)] [String]$ConfigFilePath
 )
 
-
 #if json config file does not exist, abort process
 if (-not(Test-Path -Path $ConfigFilePath -PathType Leaf)) {
     throw "json config file specified at $($ConfigFilePath) does not exist, aborting process"
@@ -87,7 +86,6 @@ if ($PowerShellObject.Required.errorMailPasswordFile) {
 }
 
 #set up variables
-[string] $strExecDir = $PSScriptRoot
 [string] $strServerName = $env:computername
 [bool] $blnWriteToLog = $false
 [string] $strRoboCopySourceDrive = "$($SourceDiskDriveLetter):\"
@@ -121,7 +119,6 @@ if ($PowerShellObject.Optional.daysToKeepLogFiles) {
 
 [bool] $blnFoundSourceDisk = $false
 [bool] $blnFoundDestinationDisk = $false
-[bool] $blnSuccessfullyObtainedDiskInfo = $false
 
 Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Beginning process to backup all data via robocopy from source disk $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) to destination disk $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID) using robocopy source drive of $($strRoboCopySourceDrive) and robocopy destination drive of $($strRoboCopyDestinationDrive)" -LogType "Info"
 
@@ -145,8 +142,7 @@ try {
 		try {
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Backing up via robocopy via the following command..." -LogType "Info"
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD ""`$RECYCLE.BIN"" ""System Volume Information"" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np" -LogType "Info"
-			#$result = robocopy G:\ T:\ /MIR /XD "$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
-			#$result = robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD "`$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
+			$result = robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD "`$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Successfully backed up data via robocopy with result $($result)" -LogType "Info"
 		} catch {
 			$ErrorMessage = $_.Exception.Message
