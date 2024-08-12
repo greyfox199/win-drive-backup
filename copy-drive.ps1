@@ -143,7 +143,12 @@ try {
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Backing up via robocopy via the following command..." -LogType "Info"
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD ""`$RECYCLE.BIN"" ""System Volume Information"" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np" -LogType "Info"
 			$result = robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD "`$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
-            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Successfully backed up data via robocopy with result $($result)" -LogType "Info"
+            if ([string]::IsNullOrWhiteSpace($result)) {
+				Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: More than likley a successful back up data via robocopy with result $($result)" -LogType "Info"
+			} else {
+				$arrStrErrors += "Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result)"
+				Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result)" -LogType "Error"
+			}
 		} catch {
 			$ErrorMessage = $_.Exception.Message
 			$line = $_.InvocationInfo.ScriptLineNumber
