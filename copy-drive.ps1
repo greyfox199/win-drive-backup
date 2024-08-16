@@ -103,7 +103,7 @@ $error.Clear()
 if (Test-Path -Path $PowerShellObject.Optional.logsDirectory -PathType Container) {
     $blnWriteToLog = $true
     [string] $strTimeStamp = $(get-date -f yyyy-MM-dd-hh_mm_ss)
-    [string] $strDetailLogFilePath = $PowerShellObject.Optional.logsDirectory + "\win-drive-bckup-status-detail-" + $strTimeStamp + ".log"
+    [string] $strDetailLogFilePath = $PowerShellObject.Optional.logsDirectory + "\win-drive-backup-status-detail-" + $strTimeStamp + ".log"
     $objDetailLogFile = [System.IO.StreamWriter] $strDetailLogFilePath
 }
 
