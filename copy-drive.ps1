@@ -142,13 +142,67 @@ try {
 		try {
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Backing up via robocopy via the following command..." -LogType "Info"
             Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD ""`$RECYCLE.BIN"" ""System Volume Information"" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np" -LogType "Info"
-			$result = robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD "`$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
+			
+            $robocopy = @{
+                FilePath = 'Robocopy.exe'
+                Wait = $true
+                NoNewWindow = $true
+                PassThru = $true
+                ArgumentList = @(
+                    '"{0}"' -f $strRoboCopySourceDrive
+                    '"{0}"' -f $strRoboCopyDestinationDrive
+                    '/MIR'
+                    '/XD'
+                    '$RECYCLE.BIN'
+                    'System Volume Information'
+                    '/Z'
+                    '/W:0'
+                    '/R:1'
+                    '/nfl'
+                    '/ndl'
+                    '/njh'
+                    '/njs'
+                    '/ns'
+                    '/nc'
+                )
+            }
+
+            $robocopy = Start-Process @robocopy
+            $exitCode = $robocopy.ExitCode
+
+            if ($exitCode -eq 0) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): No files were copied. No failure was encountered. No files were mismatched. The files already exist in the destination directory; therefore, the copy operation was skipped." -LogType "Info"
+            } elseif ($exitCode -eq 1) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): All files were copied successfully." -LogType "Info"
+            } elseif ($exitCode -eq 2) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): There are some additional files in the destination directory that aren't present in the source directory. No files were copied." -LogType "Info"
+            } elseif ($exitCode -eq 3) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Some files were copied. Additional files were present. No failure was met." -LogType "Info"
+            } elseif ($exitCode -eq 5) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Some files were copied. Some files were mismatched. No failure was met." -LogType "Info"
+            } elseif ($exitCode -eq 6) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Additional files and mismatched files exist. No files were copied and no failures were met. Which means that the files already exist in the destination directory." -LogType "Info"
+            } elseif ($exitCode -eq 7) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Files were copied, a file mismatch was present, and additional files were present." -LogType "Info"
+            } elseif ($exitCode -eq 8) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Several files didn't copy.." -LogType "Info"
+            } elseif ($exitCode -ge 8) {
+                $arrStrErrors += "Roboocopy finished with exit code of $($exitCode): Error during copy."
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Roboocopy finished with exit code of $($exitCode): Error during copy." -LogType "Error"
+            } else {
+                $arrStrErrors += "Roboocopy finished with unhandled exit code of $($exitCode): Unknown status."
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Roboocopy finished with unhandled exit code of $($exitCode): Unknown status." -LogType "Error"
+            }
+            
+            <#
+            $result = robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD "`$RECYCLE.BIN" "System Volume Information" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np
             if ([string]::IsNullOrWhiteSpace($result)) {
 				Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: More than likley a successful back up data via robocopy with result $($result)" -LogType "Info"
 			} else {
 				$arrStrErrors += "Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result)"
 				Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result)" -LogType "Error"
 			}
+            #>
 		} catch {
 			$ErrorMessage = $_.Exception.Message
 			$line = $_.InvocationInfo.ScriptLineNumber
