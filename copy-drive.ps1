@@ -216,7 +216,7 @@ if ($intDaysToKeepLogFiles -gt 0) {
         Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "$(get-date) Info: Purging log files older than $($intDaysToKeepLogFiles) days from $($PowerShellObject.Optional.logsDirectory)" -LogType "Info"
         $CurrentDate = Get-Date
         $DatetoDelete = $CurrentDate.AddDays("-$($intDaysToKeepLogFiles)")
-        Get-ChildItem "$($PowerShellObject.Optional.logsDirectory)" | Where-Object { $_.LastWriteTime -lt $DatetoDelete } | Remove-Item
+        Get-ChildItem "$($PowerShellObject.Optional.logsDirectory)" | Where-Object { $_.LastWriteTime -lt $DatetoDelete } | Remove-Item -Force
     } catch {
         $ErrorMessage = $_.Exception.Message
         $line = $_.InvocationInfo.ScriptLineNumber
