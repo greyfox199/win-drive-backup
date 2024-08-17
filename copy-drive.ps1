@@ -168,6 +168,7 @@ try {
             }
 
             $robocopy = Start-Process @robocopy
+            $robocopyOutput = $robocopy | out-string
             $exitCode = $robocopy.ExitCode
 
             if ($exitCode -eq 0) {
@@ -185,14 +186,17 @@ try {
             } elseif ($exitCode -eq 7) {
                 Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Files were copied, a file mismatch was present, and additional files were present." -LogType "Info"
             } elseif ($exitCode -eq 8) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Several files didn't copy.." -LogType "Info"
-            } elseif ($exitCode -ge 8) {
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Roboocopy finished with exit code of $($exitCode): Several files didn't copy." -LogType "Error"
+            } elseif ($exitCode -gt 8) {
                 $arrStrErrors += "Roboocopy finished with exit code of $($exitCode): Error during copy."
+                $arrStrErrors += "Roboocopy job output $($robocopyOutput)"
                 Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Roboocopy finished with exit code of $($exitCode): Error during copy." -LogType "Error"
             } else {
                 $arrStrErrors += "Roboocopy finished with unhandled exit code of $($exitCode): Unknown status."
+                $arrStrErrors += "Roboocopy job output $($robocopyOutput)"
                 Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Roboocopy finished with unhandled exit code of $($exitCode): Unknown status." -LogType "Error"
             }
+            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy job output $($robocopyOutput)" -LogType "Info"
 		} catch {
 			$ErrorMessage = $_.Exception.Message
 			$line = $_.InvocationInfo.ScriptLineNumber
