@@ -111,37 +111,37 @@ if (Test-Path -Path $PowerShellObject.Optional.logsDirectory -PathType Container
 if ($PowerShellObject.Optional.daysToKeepLogFiles) {
     try {
         $intDaysToKeepLogFiles = $PowerShellObject.Optional.daysToKeepLogFiles
-        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Using $($PowerShellObject.Optional.daysToKeepLogFiles) value specified in config file for log retention" -LogType "Info" -DisplayInConsole $false
+        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Using $($PowerShellObject.Optional.daysToKeepLogFiles) value specified in config file for log retention" -LogType "Info" -DisplayInConsole $false
     } catch {
-        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Warning: $($PowerShellObject.Optional.daysToKeepLogFiles) value specified in config file is not valid, defaulting to unlimited log retention" -LogType "Warning"
+        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$($PowerShellObject.Optional.daysToKeepLogFiles) value specified in config file is not valid, defaulting to unlimited log retention" -LogType "Warning"
     }
 }
 
 [bool] $blnFoundSourceDisk = $false
 [bool] $blnFoundDestinationDisk = $false
 
-Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Beginning process to backup all data via robocopy from source disk $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) to destination disk $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID) using robocopy source drive of $($strRoboCopySourceDrive) and robocopy destination drive of $($strRoboCopyDestinationDrive)" -LogType "Info"
+Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Beginning process to backup all data via robocopy from source disk $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) to destination disk $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID) using robocopy source drive of $($strRoboCopySourceDrive) and robocopy destination drive of $($strRoboCopyDestinationDrive)" -LogType "Info"
 
 try {
-    Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Getting all disks for comparision" -LogType "Info"
+    Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Getting all disks for comparision" -LogType "Info"
 	$objDisks = get-volume
 
 	foreach ($objDisk in $objDisks) {
 		if ($objDisk.DriveLetter -eq $SourceDiskDriveLetter -and $objDisk.Path -like "*$SourceDiskID*") {
 			$blnFoundSourceDisk = $true
-            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Found source disk" -LogType "Info"
+            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Found source disk" -LogType "Info"
 		}
 		if ($objDisk.DriveLetter -eq $DestinationDiskDriveLetter -and $objDisk.Path -like "*$DestinationDiskID*") {
 			$blnFoundDestinationDisk = $true
-            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Found destination disk" -LogType "Info"
+            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Found destination disk" -LogType "Info"
 		}
 	}
 	
 	if ($blnFoundSourceDisk -eq $true -and $blnFoundDestinationDisk -eq $true) {
-        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Successfully validated disk drive letters and IDs of source and destination disks, proceeding to attempt robocopy" -LogType "Info"
+        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Successfully validated disk drive letters and IDs of source and destination disks, proceeding to attempt robocopy" -LogType "Info"
 		try {
-            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Backing up via robocopy via the following command..." -LogType "Info"
-            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD ""`$RECYCLE.BIN"" ""System Volume Information"" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np" -LogType "Info"
+            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Backing up via robocopy via the following command..." -LogType "Info"
+            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Robocopy $strRoboCopySourceDrive $strRoboCopyDestinationDrive /MIR /XD ""`$RECYCLE.BIN"" ""System Volume Information"" /Z /W:0 /R:1 /nfl /ndl /njh /njs /ns /nc /np" -LogType "Info"
 			
             $robocopy = @{
                 FilePath = 'Robocopy.exe'
@@ -172,52 +172,52 @@ try {
             $exitCode = $robocopy.ExitCode
 
             if ($exitCode -eq 0) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): No files were copied. No failure was encountered. No files were mismatched. The files already exist in the destination directory; therefore, the copy operation was skipped." -LogType "Info"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): No files were copied. No failure was encountered. No files were mismatched. The files already exist in the destination directory; therefore, the copy operation was skipped." -LogType "Info"
             } elseif ($exitCode -eq 1) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): All files were copied successfully." -LogType "Info"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): All files were copied successfully." -LogType "Info"
             } elseif ($exitCode -eq 2) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): There are some additional files in the destination directory that aren't present in the source directory. No files were copied." -LogType "Info"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): There are some additional files in the destination directory that aren't present in the source directory. No files were copied." -LogType "Info"
             } elseif ($exitCode -eq 3) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Some files were copied. Additional files were present. No failure was met." -LogType "Info"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): Some files were copied. Additional files were present. No failure was met." -LogType "Info"
             } elseif ($exitCode -eq 5) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Some files were copied. Some files were mismatched. No failure was met." -LogType "Info"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): Some files were copied. Some files were mismatched. No failure was met." -LogType "Info"
             } elseif ($exitCode -eq 6) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Additional files and mismatched files exist. No files were copied and no failures were met. Which means that the files already exist in the destination directory." -LogType "Info"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): Additional files and mismatched files exist. No files were copied and no failures were met. Which means that the files already exist in the destination directory." -LogType "Info"
             } elseif ($exitCode -eq 7) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy finished with exit code of $($exitCode): Files were copied, a file mismatch was present, and additional files were present." -LogType "Info"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): Files were copied, a file mismatch was present, and additional files were present." -LogType "Info"
             } elseif ($exitCode -eq 8) {
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Roboocopy finished with exit code of $($exitCode): Several files didn't copy." -LogType "Error"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): Several files didn't copy." -LogType "Error"
             } elseif ($exitCode -gt 8) {
                 $arrStrErrors += "Roboocopy finished with exit code of $($exitCode): Error during copy."
                 $arrStrErrors += "Roboocopy job output $($robocopyOutput)"
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Roboocopy finished with exit code of $($exitCode): Error during copy." -LogType "Error"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with exit code of $($exitCode): Error during copy." -LogType "Error"
             } else {
                 $arrStrErrors += "Roboocopy finished with unhandled exit code of $($exitCode): Unknown status."
                 $arrStrErrors += "Roboocopy job output $($robocopyOutput)"
-                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Roboocopy finished with unhandled exit code of $($exitCode): Unknown status." -LogType "Error"
+                Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy finished with unhandled exit code of $($exitCode): Unknown status." -LogType "Error"
             }
-            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Info: Roboocopy job output $($robocopyOutput)" -LogType "Info"
+            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Roboocopy job output $($robocopyOutput)" -LogType "Info"
 		} catch {
 			$ErrorMessage = $_.Exception.Message
 			$line = $_.InvocationInfo.ScriptLineNumber
 			$arrStrErrors += "Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result) at $($line) with the following error: $ErrorMessage"
-            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result) at $($line) with the following error: $ErrorMessage" -LogType "Error"
+            Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Failed to backup all data via robocopy from $($SourceDrive) to $($DestinationDrive) with result of $($result) at $($line) with the following error: $ErrorMessage" -LogType "Error"
 		}
 	} else {
 		$arrStrErrors += "Error: There were no matches for source disk of $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) and destination disk of $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID), so not proceeding.  Please verify the output of get-volume and update the drive letters/IDs if necessary"
-		Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: There were no matches for source disk of $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) and destination disk of $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID), so not proceeding.  Please verify the output of get-volume and update the drive letters/IDs if necessary" -LogType "Error"
+		Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "There were no matches for source disk of $($SourceDiskDriveLetter) with disk ID of $($SourceDiskID) and destination disk of $($DestinationDiskDriveLetter) with disk ID of $($DestinationDiskID), so not proceeding.  Please verify the output of get-volume and update the drive letters/IDs if necessary" -LogType "Error"
 	}
 } catch {
 	$ErrorMessage = $_.Exception.Message
 	$line = $_.InvocationInfo.ScriptLineNumber
 	$arrStrErrors += "Failed to get all disks for comparision at $($line) with the following error: $ErrorMessage"
-    Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "$(get-date) Error: Failed to get all disks for comparision at $($line) with the following error: $ErrorMessage" -LogType "Error"
+    Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $true -LogString "Failed to get all disks for comparision at $($line) with the following error: $ErrorMessage" -LogType "Error"
 }
 
 #log retention
 if ($intDaysToKeepLogFiles -gt 0) {
     try {
-        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "$(get-date) Info: Purging log files older than $($intDaysToKeepLogFiles) days from $($PowerShellObject.Optional.logsDirectory)" -LogType "Info"
+        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "Purging log files older than $($intDaysToKeepLogFiles) days from $($PowerShellObject.Optional.logsDirectory)" -LogType "Info"
         $CurrentDate = Get-Date
         $DatetoDelete = $CurrentDate.AddDays("-$($intDaysToKeepLogFiles)")
         Get-ChildItem "$($PowerShellObject.Optional.logsDirectory)" | Where-Object { $_.LastWriteTime -lt $DatetoDelete } | Remove-Item -Force
@@ -225,14 +225,14 @@ if ($intDaysToKeepLogFiles -gt 0) {
         $ErrorMessage = $_.Exception.Message
         $line = $_.InvocationInfo.ScriptLineNumber
         $arrStrErrors += "Failed to purge log files older than $($intDaysToKeepLogFiles) days from $($PowerShellObject.Optional.logsDirectory) with the following error: $ErrorMessage"
-        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "$(get-date) Error: Failed to purge log files older than $($intDaysToKeepLogFiles) days from $($PowerShellObject.Optional.logsDirectory) with the following error: $ErrorMessage" -LogType "Error"
+        Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "Failed to purge log files older than $($intDaysToKeepLogFiles) days from $($PowerShellObject.Optional.logsDirectory) with the following error: $ErrorMessage" -LogType "Error"
     }
 }
 
 [int] $intErrorCount = $arrStrErrors.Count
 
 if ($intErrorCount -gt 0) {
-    Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "$(get-date) Info: Encountered $intErrorCount errors, sending error report email" -LogType "Error"
+    Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "Encountered $intErrorCount errors, sending error report email" -LogType "Error"
     #loop through all errors and add them to email body
     foreach ($strErrorElement in $arrStrErrors) {
         $intErrorCounter = $intErrorCounter + 1
@@ -240,7 +240,7 @@ if ($intErrorCount -gt 0) {
     }
     $strEmailBody = $strEmailBody + "<br>Please see $strDetailLogFilePath on $strServerName for more details"
 
-    Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "$(get-date) Info: Sending email error report via $($errorMailAppID) app on $($errorMailTenantID) tenant from $($errorMailSender) to $($errorMailRecipients) as specified in config file" -LogType "Info"
+    Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "Sending email error report via $($errorMailAppID) app on $($errorMailTenantID) tenant from $($errorMailSender) to $($errorMailRecipients) as specified in config file" -LogType "Info"
     $errorEmailPasswordSecure = Get-Content $errorMailPasswordFile | ConvertTo-SecureString
     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($errorEmailPasswordSecure)
     $errorEmailPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
@@ -249,6 +249,6 @@ if ($intErrorCount -gt 0) {
     Send-GVMailMessage -sender $errorMailSender -TenantID $errorMailTenantID -AppID $errorMailAppID -subject "$($errorMailSubjectPrefix): Encountered $($intErrorCount) errors during process" -body $strEmailBody -ContentType "HTML" -Recipient $errorMailRecipients -ClientSecret $errorEmailPassword
 }
 
-Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "$(get-date) Info: Process Complete" -LogType "Info"
+Out-GVLogFile -LogFileObject $objDetailLogFile -WriteToLog $blnWriteToLog -LogString "Process Complete" -LogType "Info"
 
 $objDetailLogFile.close()
